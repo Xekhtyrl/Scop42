@@ -7,7 +7,10 @@
 #include "linAlg.hpp"
 #include <cmath>
 
-// should I maTe a K var for diversity (i.e K T operation and not only T T)
+
+// Custom Matrix Object Allowing you instantiate it in different way, and purpose 
+// (empty, identity, filled with 1 val, with a nested vector of T value, or even a translation or rotation matrix)
+// and to make different orperation with it 
 template <typename T>
 
 // Class declaration
@@ -36,16 +39,25 @@ class Matrix {
 		/// @brief Rotation matrix of 'rad' radians around the axis 'axis'.
 		/// @param rad Angle in radians.
 		/// @param axis A size-3 axis vector (should be normalized).
-		Matrix(double rad, std::vector<double> axis);
+		static Matrix<T> rot(T rad, std::vector<T> axis);
+
+		static Matrix<T> ortho(T left, T rigth, T bottom, T top, T near, T far);
+
+		static Matrix<T> perspective(T rad, T aspect, T near, T far);
 
 		Matrix(const Matrix<T> &other);
 		Matrix<T> &operator=(const Matrix<T> &rhs);
 		~Matrix();
 		Matrix<T> operator-(const Matrix<T>& oth) const;
+		Matrix<T>& operator-=(const Matrix<T>& oth);
 		Matrix<T> operator+(const Matrix<T>& oth) const;
+		Matrix<T>& operator+=(const Matrix<T>& oth);
 		Matrix<T> operator*(const Matrix<T>& oth) const;
-		Matrix<T> operator*(const std::vector<T>& oth) const;
+		Matrix<T>& operator*=(const Matrix<T>& oth);
+		Matrix<T> operator*(std::vector<T> oth) const;
+		Matrix<T>& operator*=(std::vector<T> oth);
 		Matrix<T> operator*(const T oth) const;
+		Matrix<T>& operator*=(const T oth);
 		// Matrix<T> &operator/(const Matrix<T>& oth);
 		// Matrix<T> &operator/(const std::vector<T>& oth);
 		// == and != too?
@@ -54,6 +66,9 @@ class Matrix {
 
 		unsigned int rows() const;
 		unsigned int cols() const;
+		const float* toGLArray(bool columnMajor = true) const;
+
+		Matrix<T>& scale(std::vector<T>);
 
 	private:
 		std::vector<std::vector<T>> _container;

@@ -1,5 +1,6 @@
 #include "Includes/header.h"
 
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -30,12 +31,12 @@ void drawTriangle() {
 
 void drawRectangles(unsigned int* VAO, unsigned int* VBO, unsigned int* EBO) {
 	float vertices[] = {
-		// positions          // colors           // texture coords
-		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f   // top left 
-	}; 
+		// positions        // texture coords
+		0.5f,  0.5f, 0.0f,  1.0f, 1.0f,   // top right
+		0.5f, -0.5f, 0.0f,  1.0f, 0.0f,   // bottom right
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,   // bottom left
+		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f    // top left 
+	};
 	unsigned int indices[] = {
 		0, 1, 3,
 		1, 2, 3
@@ -55,14 +56,14 @@ void drawRectangles(unsigned int* VAO, unsigned int* VBO, unsigned int* EBO) {
 	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	
 	// position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    // glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(6 * sizeof(float)));
+    // glEnableVertexAttribArray(2);
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
@@ -107,11 +108,15 @@ int main()
 	// CreateShader fragment(std::vector<float>({1.0f, 0.5f, 0.1f}));
 	// CreateShader fragColors;
 	try {
-		Texture tex("./Textures/container.jpg", {.params = {GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR, GL_LINEAR}});
+		Texture tex("./Textures/container.jpg", {.params = {GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR}});
 		Texture tex2("./Textures/awesomeface.png", {.type = GL_RGBA, .params = {GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR}});
-		Shader shad((std::string)"ShadersFiles/VertexTexShader01.gsls", (std::string)"ShadersFiles/FragTexShader01.gsls");
+		Shader shad((std::string)"ShadersFiles/VertexTexMatShader01.vs", (std::string)"ShadersFiles/FragTexShader01.gsls");
 		
 		// drawTriangle();
+		// trans = trans.scale(std::vector<float>({0.5,0.5,0.5}));
+		
+		Matrix<double> d = Matrix<double>::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+		std::cout << d << std::endl;
 		unsigned int VAO, VBO, EBO;
 		drawRectangles(&VAO, &VBO, &EBO);
 		
@@ -130,6 +135,14 @@ int main()
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, tex2.id());
 			
+			// Matrix<float> rot(4, 4, true);
+			shad.use();
+			Matrix<float> trans(std::vector<float>({0.5,-0.5,0.0}));
+			Matrix<float> rot = Matrix<float>::rot((float)glfwGetTime(), std::vector<float>({0.0, 0.0, 1.0}));
+			trans *= rot;
+			trans = trans.scale(std::vector<float>({0.5,0.5,0.5}));
+			unsigned int transformLoc = glGetUniformLocation(shad.getID(), "transform");
+			glUniformMatrix4fv(transformLoc, 1, GL_FALSE, trans.toGLArray(true));
 			glBindVertexArray(VAO);
 			// updateColor(shad);
 			// Clear the color buffer

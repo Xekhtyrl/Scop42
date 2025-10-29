@@ -15,7 +15,7 @@ struct TextureConfig {
 
 class Texture {
 	public:
-		Texture(std::string filePath, TextureConfig config);
+		Texture(std::string filePath, TextureConfig config = TextureConfig{});
 		Texture(const Texture &other);
 		Texture &operator=(const Texture &rhs);
 		~Texture();

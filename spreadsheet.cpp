@@ -36,4 +36,5 @@ int main() {
 	// Matrix<float> m1(3,4,2.);
 	// cout<< m1.rows() << m1.cols()<<endl;
 	cout << m1 * m2 << endl;
+	LA<float>::dot(v3,v4);
 }
