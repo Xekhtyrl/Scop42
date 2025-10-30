@@ -38,22 +38,6 @@ Matrix<T>::Matrix(std::vector<std::vector<T>> vals) {
 	return;
 }
 
-template <typename T>
-Matrix<T>::Matrix(std::vector<T> vals) {
-	if (vals.size() != 3)
-		throw std::runtime_error("Vector must be of size 3.");
-	T len = std::sqrt(vals[0]*vals[0] + vals[1]*vals[1] + vals[2]*vals[2]);
-	for (int i = 0; i < vals.size(); i++)
-		vals[i] /= len;
-	vals.push_back(1);
-	_rows = vals.size();
-	_cols = vals.size();
-	_container = std::vector<std::vector<T>>(_rows, std::vector<T>(_cols, T{}));
-	for (int i = 0; i < _rows; i++){
-		_container[i][i] = T{} + 1;
-		_container[i][_cols -1] = vals[i];
-	}
-}
 
 
 template <typename T>
@@ -68,10 +52,10 @@ Matrix<T>::Matrix(const Matrix<T> &other) {
 template <typename T>
 // Copy assignment overload
 Matrix<T> &Matrix<T>::operator=(const Matrix<T> &rhs) {
-  _container = std::vector<std::vector<T>>(rhs._container);
-  _rows = rhs._rows;
-  _cols = rhs._cols;
-  return *this;
+	_container = std::vector<std::vector<T>>(rhs._container);
+	_rows = rhs._rows;
+	_cols = rhs._cols;
+	return *this;
 }
 
 template <typename T>
@@ -79,6 +63,21 @@ template <typename T>
 Matrix<T>::~Matrix() { return; }
 
 //--------------------------Static Constructors--------------------------//
+
+template <typename T>
+Matrix<T> Matrix<T>::translation(std::vector<T> vals) {
+	if (vals.size() != 3)
+		throw std::runtime_error("Vector must be of size 3.");
+	T len = std::sqrt(vals[0]*vals[0] + vals[1]*vals[1] + vals[2]*vals[2]);
+	for (int i = 0; i < vals.size(); i++)
+		vals[i] /= len;
+	vals.push_back(1);
+	Matrix<T> res(4,4, true);
+	for (int i = 0; i < 4; i++){
+		res[i][3] = vals[i];
+	}
+	return res;
+}
 
 template <typename T>
 Matrix<T> Matrix<T>::rot(T rad, std::vector<T> axis) {
@@ -95,13 +94,15 @@ Matrix<T> Matrix<T>::rot(T rad, std::vector<T> axis) {
 	T ic = 1.0 - c;
 
 	Matrix<T> res({
-		{ c + x*x*ic,     x*y*ic - z*s,   x*z*ic + y*s,   0. },
-		{ y*x*ic + z*s,   c + y*y*ic,     y*z*ic - x*s,   0. },
-		{ z*x*ic - y*s,   z*y*ic + x*s,   c + z*z*ic,     0. },
-		{ 0., 0., 0., 1. }
+		{ c + x*x*ic,		x*y*ic - z*s,	x*z*ic + y*s,	0. },
+		{ y*x*ic + z*s,		c + y*y*ic,		y*z*ic - x*s,	0. },
+		{ z*x*ic - y*s,		z*y*ic + x*s,	c + z*z*ic,		0. },
+		{ 0., 				0., 			0., 			1. }
 	});
 	return res;
 }
+
+
 
 template <typename T>
 Matrix<T> Matrix<T>::ortho(T left, T right, T bottom, T top, T near, T far) {
@@ -121,8 +122,9 @@ Matrix<T> Matrix<T>::perspective(T rad, T aspect, T near, T far) {
 		{1 / (aspect * tR),	0,			0,								0								},
 		{0,					1 / tR,		0,								0								},
 		{0,					0,			-(far + near) / (far - near),	-2 * far * near / (far - near)	},
-		{0,					0,			0,								1								}
+		{0,					0,			-1,								0								}
 	});
+	return res;
 }
 
 

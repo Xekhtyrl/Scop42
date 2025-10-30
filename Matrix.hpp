@@ -34,7 +34,7 @@ class Matrix {
 
 		/// @brief Create an identity matrix with a translation vector (3 elements).
 		/// @param vec A size-3 vector containing translation components.
-		Matrix(std::vector<T> vec);
+		static Matrix<T> translation(std::vector<T> vec);
 
 		/// @brief Rotation matrix of 'rad' radians around the axis 'axis'.
 		/// @param rad Angle in radians.

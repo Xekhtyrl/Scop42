@@ -84,7 +84,20 @@ void updateColor(Shader shad) {
     // int vertexColorLocation = glGetUniformLocation(shad.getID(), "ourColor");
     // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 }
-#include <array>
+
+void defineMatrices(unsigned int ID) {
+	Matrix<double> model = Matrix<double>::rot((float)glfwGetTime() * degreeToRad(50.), {0.5,1.,0.});
+	Matrix<double> view = Matrix<double>::translation({0.,0.,-3.});
+	Matrix<double> projection = Matrix<double>::perspective(degreeToRad(45.), 800. /  600., 0.1, 100.);
+	int modelLoc = glGetUniformLocation(ID, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, model.toGLArray());
+	int viewLoc = glGetUniformLocation(ID, "view");
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.toGLArray());
+	int projectionLoc = glGetUniformLocation(ID, "projection");
+	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, projection.toGLArray());
+
+}
+
 int main()
 {
 	GLFWwindow* window = initWindow();
@@ -110,13 +123,14 @@ int main()
 	try {
 		Texture tex("./Textures/container.jpg", {.params = {GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR}});
 		Texture tex2("./Textures/awesomeface.png", {.type = GL_RGBA, .params = {GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR}});
-		Shader shad((std::string)"ShadersFiles/VertexTexMatShader01.vs", (std::string)"ShadersFiles/FragTexShader01.gsls");
+		// Shader shad((std::string)"ShadersFiles/VertexTexMatShader01.vs", (std::string)"ShadersFiles/FragTexShader01.gsls");
+		Shader shad((std::string)"ShadersFiles/VertexMVP.vs", (std::string)"ShadersFiles/FragTexShader01.gsls");
 		
 		// drawTriangle();
 		// trans = trans.scale(std::vector<float>({0.5,0.5,0.5}));
 		
-		Matrix<double> d = Matrix<double>::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-		std::cout << d << std::endl;
+		// Matrix<double> d = Matrix<double>::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+		// std::cout << d << std::endl;
 		unsigned int VAO, VBO, EBO;
 		drawRectangles(&VAO, &VBO, &EBO);
 		
@@ -137,17 +151,18 @@ int main()
 			
 			// Matrix<float> rot(4, 4, true);
 			shad.use();
-			Matrix<float> trans(std::vector<float>({0.5,-0.5,0.0}));
-			Matrix<float> rot = Matrix<float>::rot((float)glfwGetTime(), std::vector<float>({0.0, 0.0, 1.0}));
-			trans *= rot;
-			trans = trans.scale(std::vector<float>({0.5,0.5,0.5}));
-			unsigned int transformLoc = glGetUniformLocation(shad.getID(), "transform");
-			glUniformMatrix4fv(transformLoc, 1, GL_FALSE, trans.toGLArray(true));
+			defineMatrices(shad.getID());
+			// Matrix<float> trans = Matrix<float>::translation({0.5,-0.5,0.0});
+			// Matrix<float> rot = Matrix<float>::rot((float)glfwGetTime(), std::vector<float>({0.0, 0.0, 1.0}));
+			// trans *= rot;
+			// trans = trans.scale(std::vector<float>({0.5,0.5,0.5}));
+			// unsigned int transformLoc = glGetUniformLocation(shad.getID(), "transform");
+			// glUniformMatrix4fv(transformLoc, 1, GL_FALSE, trans.toGLArray(true));
 			glBindVertexArray(VAO);
 			// updateColor(shad);
 			// Clear the color buffer
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			// glDrawArrays(GL_TRIANGLES, 0, 3);
+			// glDrawArrays(GL_TRIANGLES, 0, 36);
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
