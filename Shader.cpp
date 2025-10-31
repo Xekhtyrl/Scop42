@@ -48,7 +48,7 @@ void Shader::CompileShader(unsigned int& shader, const char* shaderCode, unsigne
 	if(!success)
 	{
 		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+		std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	};
 }
 
@@ -68,7 +68,7 @@ void Shader::CreateShaderProgram(unsigned int vertex, unsigned int fragment) {
 	if(!success)
 	{
 		glGetProgramInfoLog(ID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
 	}
 	// glDeleteShader(frag);
 }
@@ -96,6 +96,11 @@ void Shader::setFloats(const std::string &name, float r, float g, float b, float
 	glUniform4f(glGetUniformLocation(ID, name.c_str()), r, g, b, a); 
 }
 
+void Shader::setMat(const char *name, const float* array) {
+	int uniformLocation = glGetUniformLocation(ID, name);
+	glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, array);
+}
+
 void Shader::addShader(const char *shaderCode, unsigned int type) {
 	unsigned int shader;
 	int success;
@@ -108,7 +113,7 @@ void Shader::addShader(const char *shaderCode, unsigned int type) {
 	if(!success)
 	{
 		glGetProgramInfoLog(ID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
 	}
 	glDeleteShader(shader);
 }

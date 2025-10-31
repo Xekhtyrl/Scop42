@@ -1,7 +1,4 @@
-
 #include "Matrix.hpp"
-#include "linAlg.hpp"
-
 
 //---------------------------Constructors && Destructor---------------------------//
 
@@ -68,12 +65,8 @@ template <typename T>
 Matrix<T> Matrix<T>::translation(std::vector<T> vals) {
 	if (vals.size() != 3)
 		throw std::runtime_error("Vector must be of size 3.");
-	T len = std::sqrt(vals[0]*vals[0] + vals[1]*vals[1] + vals[2]*vals[2]);
-	for (int i = 0; i < vals.size(); i++)
-		vals[i] /= len;
-	vals.push_back(1);
 	Matrix<T> res(4,4, true);
-	for (int i = 0; i < 4; i++){
+	for (int i = 0; i < 3; i++){
 		res[i][3] = vals[i];
 	}
 	return res;
@@ -102,8 +95,6 @@ Matrix<T> Matrix<T>::rot(T rad, std::vector<T> axis) {
 	return res;
 }
 
-
-
 template <typename T>
 Matrix<T> Matrix<T>::ortho(T left, T right, T bottom, T top, T near, T far) {
 	Matrix <T> res({
@@ -127,6 +118,21 @@ Matrix<T> Matrix<T>::perspective(T rad, T aspect, T near, T far) {
 	return res;
 }
 
+template <typename T>
+Matrix<T> Matrix<T>::lookAt(std::vector<T> eye,std::vector<T> center,std::vector<T> rawUp) {
+	std::vector<T> direction = normalize(LA<T>::sub(center, eye));
+	std::vector<T> right = normalize(LA<T>::cross(direction, rawUp));
+	std::vector<T> up = LA<T>::cross(right, direction);
+	std::vector<T> perception = {-LA<T>::dot(right, eye), -LA<T>::dot(up, eye), LA<T>::dot(direction, eye)};
+
+	Matrix<T> res({
+		{right[0],		right[1],		right[2],		perception[0]	},
+		{up[0],			up[1],			up[2],			perception[1]	},
+		{direction[0],	direction[1],	direction[2],	perception[2]	},
+		{0,				0,				0,				1				}
+	});
+	return res;
+}
 
 //--------------------------operations Overload Operators--------------------------//
 

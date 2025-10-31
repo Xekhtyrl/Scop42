@@ -6,8 +6,10 @@
 #include <iostream>
 #include "linAlg.hpp"
 #include <cmath>
+#include "Includes/header.h"
 
-
+template<typename T>
+std::vector<T> normalize(std::vector<T> vec);
 // Custom Matrix Object Allowing you instantiate it in different way, and purpose 
 // (empty, identity, filled with 1 val, with a nested vector of T value, or even a translation or rotation matrix)
 // and to make different orperation with it 
@@ -44,6 +46,8 @@ class Matrix {
 		static Matrix<T> ortho(T left, T rigth, T bottom, T top, T near, T far);
 
 		static Matrix<T> perspective(T rad, T aspect, T near, T far);
+
+		static Matrix<T> lookAt(std::vector<T>,std::vector<T>,std::vector<T>);
 
 		Matrix(const Matrix<T> &other);
 		Matrix<T> &operator=(const Matrix<T> &rhs);

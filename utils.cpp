@@ -34,3 +34,4 @@ std::string fileToStr(std::string filePath) {
 	strTrim(fileStr);
 	return fileStr;
 }
+

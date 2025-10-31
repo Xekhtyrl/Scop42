@@ -1,33 +1,44 @@
 NAME = testGL
+
+INC = ./Includes
+HOME_LIB  = $(HOME)/.local/lib
+HOME_INC  = $(HOME)/.local/include
+DIR_OBJ = Obj/
+
 SRCS = test.cpp CreateShader.cpp utils.cpp Shader.cpp Texture.cpp stb_image.cpp
 SRCC = glad.c
-DIR_OBJ = Obj/
+
 OBJ = $(addprefix $(DIR_OBJ), $(SRCS:.cpp=.o))
 OBJ += $(addprefix $(DIR_OBJ), $(SRCC:.c=.o))
 
-CFLAGS = -std=c++20 #-Wall -Wextra -Werror
-INC = ./Includes
+CXX       := c++
+CC        := gcc
 
-INCLUDE = -I$(INC) \
-		  -I$(INC)/glad/include \
-          -I$(HOME)/.local/include \
-          -L$(HOME)/.local/lib \
-          -Wl,-rpath,$(HOME)/.local/lib \
-		  -lglfw3 -ldl -lGL -lpthread -lX11
+CXXFLAGS  = -std=c++20 -g3 -fsanitize=address #-Wall -Wextra -Werror
+CFLAGS    = -Wall -Wextra -Werror -g3 -fsanitize=address
+
+INCLUDES  := -I$(INC) \
+             -I$(INC)/glad/include \
+             -I$(HOME_INC)
+
+LIBS      := -L$(HOME_LIB) \
+             -Wl,-rpath,$(HOME_LIB) \
+             -lglfw3 -ldl -lGL -lpthread -lX11
 
 all: $(NAME)
 
 $(NAME): openGL $(OBJ)
-	c++ $(CFLAGS) $(OBJ) $(INCLUDE) -o $(NAME)
+	$(CXX) $(CXXFLAGS) $(OBJ) $(LIBS) -o $@
 
-# Compile .cpp files with the C++ compiler
+# Compile .cpp source files
 $(DIR_OBJ)%.o: %.cpp
-	mkdir -p $(DIR_OBJ)
-	c++ $(CFLAGS) $(INCLUDE) -c $< -o $@
+	mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
-# Compile .c files with the C compiler
+# Compile .c source files
 $(DIR_OBJ)%.o: %.c
-	gcc $(CFLAGS) $(INCLUDE) -c $< -o $@
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 openGL:
 	cd $(INC)/glfw-3.4 && \

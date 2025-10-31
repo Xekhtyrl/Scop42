@@ -25,3 +25,19 @@ template<typename T>
 T degreeToRad(T angle) {
 	return angle * (M_PI / 180);
 };
+
+template<typename T>
+std::vector<T> normalize(std::vector<T> vec) {
+	T norm = 0;
+	size_t len = vec.size();
+	for (size_t i = 0; i < len; i++) {
+		norm += vec[i] * vec[i];
+	}
+	norm = sqrt(norm);
+	if (norm == 0.0) 
+		throw std::runtime_error("Cannot normalize a zero-length vector");
+	for(T &x: vec) {
+		x /= norm;
+	}
+	return vec;
+};

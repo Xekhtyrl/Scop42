@@ -37,4 +37,5 @@ int main() {
 	// cout<< m1.rows() << m1.cols()<<endl;
 	cout << m1 * m2 << endl;
 	LA<float>::dot(v3,v4);
+	// v3 = v4 - v3;
 }
