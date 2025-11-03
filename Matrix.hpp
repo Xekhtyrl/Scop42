@@ -2,14 +2,11 @@
 #ifndef MATRIX_HPP_
 #define MATRIX_HPP_
 
-#include <vector>
-#include <iostream>
-#include "linAlg.hpp"
-#include <cmath>
 #include "Includes/header.h"
+#include "linAlg.hpp"
 
-template<typename T>
-std::vector<T> normalize(std::vector<T> vec);
+template<typename Container>
+Container normalize(Container vec);
 // Custom Matrix Object Allowing you instantiate it in different way, and purpose 
 // (empty, identity, filled with 1 val, with a nested vector of T value, or even a translation or rotation matrix)
 // and to make different orperation with it 

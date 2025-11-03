@@ -1,0 +1,7 @@
+Includes/glfw-3.4
+Includes/glad.zip
+*.o
+*.out
+testGL
+.git
+Obj

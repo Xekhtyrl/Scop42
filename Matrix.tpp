@@ -1,4 +1,7 @@
+#include "Includes/header.h"
+#include "linAlg.hpp"
 #include "Matrix.hpp"
+#include "Vector.hpp"
 
 //---------------------------Constructors && Destructor---------------------------//
 
@@ -119,20 +122,44 @@ Matrix<T> Matrix<T>::perspective(T rad, T aspect, T near, T far) {
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::lookAt(std::vector<T> eye,std::vector<T> center,std::vector<T> rawUp) {
-	std::vector<T> direction = normalize(LA<T>::sub(center, eye));
-	std::vector<T> right = normalize(LA<T>::cross(direction, rawUp));
-	std::vector<T> up = LA<T>::cross(right, direction);
-	std::vector<T> perception = {-LA<T>::dot(right, eye), -LA<T>::dot(up, eye), LA<T>::dot(direction, eye)};
+Matrix<T> Matrix<T>::lookAt(std::vector<T> eye,
+                            std::vector<T> center,
+                            std::vector<T> upRaw)
+{
+    std::vector<T> f = normalize(LA<T>::sub(center, eye));  // forward
+    std::vector<T> s = normalize(LA<T>::cross(f, upRaw));   // right
+    std::vector<T> u = LA<T>::cross(s, f);                  // up
 
-	Matrix<T> res({
-		{right[0],		right[1],		right[2],		perception[0]	},
-		{up[0],			up[1],			up[2],			perception[1]	},
-		{direction[0],	direction[1],	direction[2],	perception[2]	},
-		{0,				0,				0,				1				}
-	});
-	return res;
+    Matrix<T> res({
+        { s[0], s[1], s[2], -LA<T>::dot(s, eye) },
+        { u[0], u[1], u[2], -LA<T>::dot(u, eye) },
+        { -f[0], -f[1], -f[2], LA<T>::dot(f, eye) },
+        { 0, 0, 0, 1 }
+    });
+
+    return res;
 }
+
+// template <typename T>
+// Matrix<T> Matrix<T>::lookAt(std::vector<T> eye,std::vector<T> center,std::vector<T> rawUp) {
+// 	std::cout << "For eye: " << Vector<T>(eye);
+// 	std::cout << "For center: " << Vector<T>(center);
+// 	std::cout << "For rawUp: " << Vector<T>(rawUp);
+
+// 	std::vector<T> direction = normalize(LA<T>::sub(center, eye));
+//	std::vector<T> right = normalize(LA<T>::cross(direction, rawUp));
+// 	std::vector<T> up = LA<T>::cross(right, direction);
+// 	std::vector<T> perception = {-LA<T>::dot(right, eye), -LA<T>::dot(up, eye), LA<T>::dot(direction, eye)};
+
+// 	Matrix<T> res({
+// 		{right[0],		right[1],		right[2],		perception[0]	},
+// 		{up[0],			up[1],			up[2],			perception[1]	},
+// 		{direction[0],	direction[1],	direction[2],	perception[2]	},
+// 		{0,				0,				0,				1				}
+// 	});
+// 	std::cout << res << std::endl;
+// 	return res;
+// }
 
 //--------------------------operations Overload Operators--------------------------//
 
