@@ -147,8 +147,10 @@ void defineMatrices(Shader shad, Camera& camera) {
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, projection.toGLArray(true));
 }
 
-int main()
+#include "Model.hpp"
+int main(int argc, char **argv)
 {
+	Model obj(argv[argc - 1]);
 	// Camera camera(Vector<float>({0.,0.,3.}));
 	GLFWwindow* window = initWindow();
 	if (window == NULL)

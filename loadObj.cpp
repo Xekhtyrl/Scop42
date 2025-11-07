@@ -8,14 +8,25 @@
 "g"
 "s"
 */
-#include <iostream>
 #include <fstream>
-void readFile(std::ifstream file) {
-	std::string tmp;
-	while(getline(file, tmp)) {
-		if (tmp.find('#') == 0)
-			continue;
-		if (tmp.find("vn") == 0)
-			
-	}
-}
+#include <sstream>
+#include <string>
+#include <vector>
+#include <iostream>
+
+struct Face {
+    std::vector<int> indices;
+};
+struct Mesh {
+    std::string name;
+    std::string material;
+    std::vector<Face> faces; 
+};
+struct Model {
+    std::string mtllib;
+    std::vector <std::vector<float>> vertices;
+    std::vector <std::vector<float>> normals;
+    std::vector <std::vector<float>> texcoords;
+    std::vector<Mesh> meshes;
+};
+
