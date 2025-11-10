@@ -1,9 +1,9 @@
 
-if (NOT EXISTS "/home/lvodak/19/graph_game/Scop42/Includes/glfw-3.4/build/install_manifest.txt")
-    message(FATAL_ERROR "Cannot find install manifest: \"/home/lvodak/19/graph_game/Scop42/Includes/glfw-3.4/build/install_manifest.txt\"")
+if (NOT EXISTS "/mnt/c/Users/User/Documents/19/Graph_game/Scop42/Includes/glfw-3.4/build/install_manifest.txt")
+    message(FATAL_ERROR "Cannot find install manifest: \"/mnt/c/Users/User/Documents/19/Graph_game/Scop42/Includes/glfw-3.4/build/install_manifest.txt\"")
 endif()
 
-file(READ "/home/lvodak/19/graph_game/Scop42/Includes/glfw-3.4/build/install_manifest.txt" files)
+file(READ "/mnt/c/Users/User/Documents/19/Graph_game/Scop42/Includes/glfw-3.4/build/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 
 foreach (file ${files})

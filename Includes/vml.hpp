@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cmath>
 
+
 //stand for Vectors and Matrices Library
 namespace vml {
 	//Vector Template Structures with operators definitions and other operation functions
@@ -14,9 +15,31 @@ namespace vml {
 		constexpr Vector() : data{} {}
 		constexpr Vector(std::initializer_list<T> vals) {
 			size_t i = 0;
-			for (auto &x : vals)
-				data[i++] = x;
+
+			if (vals.size() == 1) {
+				T val = *vals.begin();
+				for (; i < N; ++i)
+					data[i] = val;
+			} else {
+				for (auto &x : vals) {
+					if (i >= N) break;
+					data[i++] = x;
+				}
+				// if less values than N, fill the rest with 0
+				for (; i < N; ++i)
+					data[i] = T{};
+			}
 		}
+		constexpr Vector(T val) {
+			for (size_t i = 0; i < N; i++)
+				data[i] = val;
+		}
+		constexpr Vector(float* vals) {
+			for (size_t i = 0; i < N; i++)
+				data[i] = vals[i];
+		}
+		
+		// allow to construct a vector with another vector and other arguments
 		template<size_t N2, typename... Args>
 		constexpr Vector(const Vector<T, N2>& vec, Args... values)
 		requires (N == N2 + sizeof...(Args)) {
@@ -75,6 +98,14 @@ namespace vml {
 			for (T& x : data)
 				x *= val;
 			return *this;
+		}
+				// Cross product (only for 3D)
+		Vector<T, 3> operator*(const Vector<T, 3>& v) const requires (N == 3) {
+			return {
+				data[1] * v.data[2] - data[2] * v.data[1],
+				data[2] * v.data[0] - data[0] * v.data[2],
+				data[0] * v.data[1] - data[1] * v.data[0]
+			};
 		}
 
 		// getter
@@ -213,15 +244,15 @@ namespace vml {
 	using mat4 = Matrix<float, 4, 4>;
 
 	// radian to degree and reverse conversion function
-	float radians(float angle) {
+	inline float radians(float angle) {
 		return angle * (M_PI / 180);
 	}
-	float degree(float rad) {
+	inline float degree(float rad) {
 		return rad * (180 / M_PI);
 	}
 
 	// Some Vector operations redefine as functions out of the Vector Struct
-	vec3 cross(vec3 v1, vec3 v2) {
+	inline vec3 cross(vec3 v1, vec3 v2) {
 		return vec3{
 			v1[1] * v2[2] - v1[2] * v2[1],
 			v1[2] * v2[0] - v1[0] * v2[2],
@@ -236,7 +267,7 @@ namespace vml {
 		return res;
 	}
 	template<typename T, size_t N>
-	Vector<T, N> normalize(Vector<T, N> vec) {
+	inline Vector<T, N> normalize(Vector<T, N> vec) {
 		T len = vec.norm();
 		Vector<T, N> res;
 		for (size_t i = 0; i < N; i++)
@@ -253,6 +284,8 @@ namespace vml {
 	}
 
 	inline mat4 translation(vec3 vals) {
+		// std::cout << "in translation >> vec3 vals:" << std::endl;
+		// vals.print();
 		mat4 res = identity<float, 4>();
 		for (int i = 0; i < 3; i++){
 			res[i][3] = vals[i];

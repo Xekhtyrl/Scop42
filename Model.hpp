@@ -3,10 +3,10 @@
 #include <iostream>
 #include "Shader.hpp"
 #include "Mesh.hpp"
-#include "Vector.hpp"
+#include "Includes/vml.hpp"
 #include <unordered_map>
 
-
+using namespace vml;
 
 static void parseFaceVertex(const std::string& fLine, unsigned int& vId, unsigned int& vtId, unsigned int& vnId) {
 	vId = vtId = vnId = 0;
@@ -31,13 +31,22 @@ struct Vertex;
 // ─────────────────────────────────────────────
 // Represents one material definition (.mtl)
 struct Material {
-    std::string name;      // e.g. "darksilver"
-    Vector<float> Ka;      // ambient color
-    Vector<float> Kd;      // diffuse color
-    Vector<float> Ks;      // specular color
-    float Ns = 0.0f;         // shininess
-    std::string map_Kd;   // texture path
+    std::string name;
+    vec3 ambient{1.0f};
+    vec3 diffuse{1.0f};
+    vec3 specular{1.0f};
+    float shininess = 32.0f;
+    float opacity = 1.0f;
+
+    std::string mapKdPath; // diffuse texture file path
+    std::string mapKsPath; // specular texture
+    std::string mapBumpPath; // normal/bump map
+
+    GLuint diffuseTex = 0;
+    GLuint specularTex = 0;
+    GLuint normalTex = 0;
 };
+
 class Model 
 {
     public:
@@ -61,9 +70,9 @@ class Model
             if (!file.is_open())
                 throw std::runtime_error("Error: Object File could not be opened or does not exist.");
             
-            std::vector<my_glm::vec3> temp_v;
-            std::vector<my_glm::vec3> temp_vn;
-            std::vector<my_glm::vec2> temp_vt;
+            std::vector<vec3> temp_v;
+            std::vector<vec3> temp_vn;
+            std::vector<vec2> temp_vt;
 			float x, y, z;
 			Mesh currentMesh;
 
@@ -110,7 +119,7 @@ class Model
 				}
 				else if (tmp.find("g") == 0) {
 					if (!currentMesh.vertices().empty()) {
-						std::cout << currentMesh <<std::endl;
+						// std::cout << currentMesh <<std::endl;
 						meshes.push_back(currentMesh);
 						currentMesh = Mesh();
 					}
@@ -142,7 +151,7 @@ class Model
 				}
             }
 			if (!currentMesh.vertices().empty()){
-				std::cout << currentMesh <<std::endl;
+				// std::cout << currentMesh <<std::endl;
 				meshes.push_back(currentMesh);
 			}
         }

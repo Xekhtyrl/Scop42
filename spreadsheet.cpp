@@ -4,7 +4,7 @@
 // #include "linAlg.hpp"
 // #include "Matrix.hpp"
 #include "Includes/vml.hpp"
-#include "my_glm.h"
+// #include "my_glm.h"
 
 using namespace std;
 using namespace vml;
@@ -25,7 +25,19 @@ T add(T a, T b) {
 }
 
 int main() {
-	vec3 v1;
-	mat4 rot = rotation(radians(50.), vec3({1.,1.,0.}));
-	rot.print();
+	
+	vec3 v1{1.0, 2.};
+	v1.print();
+	vec3 v2({2,3,1});
+	vec3 res1 = cross(v1, v2);
+	// vec3 res2 = v1.cross(v2);
+	vec3 res2 = cross(v1, v2);
+
+	// res1.print();
+	// res2.print();
+	// v1.print();
+	// mat4 rot = rotation(radians(50.), vec3({1.,1.,0.}));
+	// rot.print();
+	// mat4 la = lookAt(vec3{1.,0,0}, vec3{0.,1,1}, vec3{0,0,1});
+	// la.print();
 }

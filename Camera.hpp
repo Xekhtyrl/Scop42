@@ -1,11 +1,10 @@
 #pragma once
 
 #include <glad/glad.h>
-#include "Vector.hpp"
-#include "Matrix.hpp"
-#include "Includes/utilsTemplate.hpp"
+#include "Includes/vml.hpp"
+// #include "my_glm.h"
 
-
+using namespace vml;
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement {
     FORWARD,
@@ -27,11 +26,11 @@ class Camera
 {
 public:
     // camera Attributes
-    Vector<float> Position;
-    Vector<float> Front;
-    Vector<float> Up;
-    Vector<float> Right;
-    Vector<float> WorldUp;
+    vec3 Position;
+    vec3 Front;
+    vec3 Up;
+    vec3 Right;
+    vec3 WorldUp;
     // euler Angles
     float Yaw;
     float Pitch;
@@ -41,7 +40,7 @@ public:
     float Zoom;
 
     // constructor with vectors
-    Camera(Vector<float> position = Vector<float>({0.0f, 0.0f, 0.0f}), Vector<float> up = Vector<float>({0.0f, 1.0f, 0.0f}), float yaw = YAW, float pitch = PITCH) : Front(Vector<float>({0.0f, 0.0f, -1.0f})), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+    Camera(vec3 position = vec3({0.0f, 0.0f, 0.0f}), vec3 up = vec3({0.0f, 1.0f, 0.0f}), float yaw = YAW, float pitch = PITCH) : Front(vec3({0.0f, 0.0f, -1.0f})), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
         Position = position;
         WorldUp = up;
@@ -50,10 +49,10 @@ public:
         updateCameraVectors();
     }
     // constructor with scalar values
-    Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(Vector<float>({0.0f, 0.0f, -1.0f})), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+    Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(vec3({0.0f, 0.0f, -1.0f})), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
-        Position = Vector<float>({posX, posY, posZ});
-        WorldUp = Vector<float>({upX, upY, upZ});
+        Position = vec3({posX, posY, posZ});
+        WorldUp = vec3({upX, upY, upZ});
         Yaw = yaw;
         Pitch = pitch;
         updateCameraVectors();
@@ -75,9 +74,9 @@ public:
 		return *this;
 	}
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
-    Matrix<float> GetViewMatrix()
+    mat4 GetViewMatrix()
     {
-        return Matrix<float>::lookAt(Position.container(), (Position + Front).container(), Up.container());
+        return lookAt(Position, (Position + Front), Up);
     }
 
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
@@ -131,13 +130,16 @@ private:
     void updateCameraVectors()
     {
         // calculate the new Front vector
-        Vector<float> front(3);
-        front[0] = cos(degreeToRad(Yaw)) * cos(degreeToRad(Pitch));
-        front[1] = sin(degreeToRad(Pitch));
-        front[2] = sin(degreeToRad(Yaw)) * cos(degreeToRad(Pitch));
+        vec3 front;
+        front[0] = cos(radians(Yaw)) * cos(radians(Pitch));
+        front[1] = sin(radians(Pitch));
+        front[2] = sin(radians(Yaw)) * cos(radians(Pitch));
+	    // front.x = cos(radians(Yaw)) * cos(radians(Pitch));
+        // front.y = sin(radians(Pitch));
+        // front.z = sin(radians(Yaw)) * cos(radians(Pitch));
         Front = normalize(front);
         // also re-calculate the Right and Up vector
-        Right = normalize((Front * WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-        Up    = normalize((Right * Front));
+        Right = normalize(cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+        Up    = normalize(cross(Right, Front));
     }
 };

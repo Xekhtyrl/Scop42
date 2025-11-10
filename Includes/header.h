@@ -6,13 +6,9 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include "utilsTemplate.hpp"
 #include "../CreateShader.hpp"
 #include "../Shader.hpp"
 #include "../Texture.hpp"
-#include "../Matrix.hpp"
-#include "../Vector.hpp"
-#include "../linAlg.hpp"
 #include "../Camera.hpp"
 
 std::string floatToStr(float value);

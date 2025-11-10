@@ -10,7 +10,7 @@ CreateShader::CreateShader() {
 		"    FragColor = ourColor;\n"
 		"}\0");
 	return; }
-CreateShader::CreateShader(std::vector<float> colors) { 
+CreateShader::CreateShader(vec3 colors) { 
 	_content.push_back("#version 330 core\n");
 	FragmentShader(colors);
 	return;
@@ -41,10 +41,10 @@ CreateShader &CreateShader::operator=(const CreateShader &rhs) {
 // Default destructor
 CreateShader::~CreateShader() { return; }
 
-void CreateShader::FragmentShader(std::vector<float> colors) {
+void CreateShader::FragmentShader(vec3 colors) {
 	std::string colorStr;
-	for (int i = 0; i < colors.size(); i++)
-		colorStr.append(floatToStr(colors[i]) + ", ");
+	// for (int i = 0; i < 3; i++)
+	// 	colorStr.append(floatToStr(colors[i]) + ", ");
 	strTrim(colorStr, ", ");
 	_content.push_back("out vec4 FragColor;\n\n");
 	_content.push_back("void main()\n{\n");

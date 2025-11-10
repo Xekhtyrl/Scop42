@@ -98,7 +98,7 @@ void Shader::setFloats(const std::string &name, float r, float g, float b, float
 
 void Shader::setMat(const char *name, const float* array) {
 	int uniformLocation = glGetUniformLocation(ID, name);
-	glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, array);
+	glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, array);
 }
 
 void Shader::addShader(const char *shaderCode, unsigned int type) {

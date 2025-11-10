@@ -1,7 +1,7 @@
-prefix=/home/lvodak/.local
+prefix=/home/xekhtyrl/.local
 exec_prefix=${prefix}
-includedir=/home/lvodak/.local/include
-libdir=/home/lvodak/.local/lib
+includedir=/home/xekhtyrl/.local/include
+libdir=/home/xekhtyrl/.local/lib
 
 Name: GLFW
 Description: A multi-platform library for OpenGL, window and input

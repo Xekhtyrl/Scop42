@@ -192,6 +192,23 @@ namespace my_glm {
     inline float clamp(float x, float a, float b) {
         return std::min(std::max(x, a), b);
     }
+	inline void printv2(vec2 v) {std::cout << "[" << v.x << " " << v.y << "]" <<std::endl;}
+	inline void printv3(vec3 v) {std::cout << "[" << v.x << " " << v.y << " " << v.z << "]" << std::endl;}
+	inline void printm4(mat4 v) {
+		std::cout << "[";
+		for (int i = 0; i < 4; i++) {
+			std::cout << "[";
+			for (int j = 0; j< 4; j++) {
+				std::cout << v[i][j];
+				if (j < 3)
+					std::cout <<", ";
+			}
+			std::cout << "]";
+			if (i < 3)
+				std::cout << "\n";
+		}
+		std::cout << "]" << std::endl;
+	}
 
 }
 

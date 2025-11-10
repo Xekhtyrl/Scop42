@@ -1,6 +1,8 @@
 #include "Includes/header.h"
-#include "Vector.hpp"
+#include "Includes/vml.hpp"
 #include "Camera.hpp"
+
+using namespace vml;
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -9,7 +11,7 @@ float lastFrame = 0.0f; // Time of last frame
 bool firstMouse = true;
 float lastX =  SCR_WIDTH / 2.0;
 float lastY =  SCR_HEIGHT / 2.0;
-Camera camera(Vector<float>({0.,0.,3.}));
+Camera camera(vec3({0.,0.,3.}));
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -138,20 +140,19 @@ GLFWwindow* initWindow() {
 }
 
 void defineMatrices(Shader shad, Camera& camera) {
-	Matrix<float> view = camera.GetViewMatrix();
-	Matrix<float> projection = Matrix<float>::perspective(degreeToRad(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1, 100.);
+	mat4 view = camera.GetViewMatrix();
+	mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1, 100.);
 
 	int viewLoc = glGetUniformLocation(shad.getID(), "view");
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, view.toGLArray(true));
+	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, view.data);
 	int projectionLoc = glGetUniformLocation(shad.getID(), "projection");
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, projection.toGLArray(true));
+	glUniformMatrix4fv(projectionLoc, 1, GL_TRUE, projection.data);
 }
 
 #include "Model.hpp"
 int main(int argc, char **argv)
 {
 	Model obj(argv[argc - 1]);
-	// Camera camera(Vector<float>({0.,0.,3.}));
 	GLFWwindow* window = initWindow();
 	if (window == NULL)
 	{
@@ -186,18 +187,18 @@ int main(int argc, char **argv)
 		Texture tex("./Textures/BlackLodge.png", {.params = {GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR}});
 		Texture tex2("./Textures/awesomeface.png", {.type = GL_RGBA, .params = {GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR}});
 		Shader shad((std::string)"ShadersFiles/VertexMVP.vs", (std::string)"ShadersFiles/FragTexShader01.gsls");
-		Matrix<double> cubePositions({
-			{ 0.0f,  0.0f,  0.0f}, 
-			{ 2.0f,  5.0f, -15.0f}, 
+		std::vector<vec3> cubePositions= {
+			 {0.0f,  0.0f,  0.0f}, 
+			 {2.0f,  5.0f, -15.0f}, 
 			{-1.5f, -2.2f, -2.5f},  
 			{-3.8f, -2.0f, -12.3f},  
-			{ 2.4f, -0.4f, -3.5f},  
+			 {2.4f, -0.4f, -3.5f},  
 			{-1.7f,  3.0f, -7.5f},  
-			{ 1.3f, -2.0f, -2.5f},  
-			{ 1.5f,  2.0f, -2.5f}, 
-			{ 1.5f,  0.2f, -1.5f}, 
+			 {1.3f, -2.0f, -2.5f},  
+			 {1.5f,  2.0f, -2.5f}, 
+			 {1.5f,  0.2f, -1.5f}, 
 			{-1.3f,  1.0f, -1.5f}
-		});
+		};
 		unsigned int VAO, VBO, EBO;
 		drawRectangles(&VAO, &VBO, &EBO);
 		
@@ -224,11 +225,11 @@ int main(int argc, char **argv)
 			glBindVertexArray(VAO);
 			for(unsigned int i = 0; i < 10; i++)
 			{
-				Matrix<double> model = Matrix<double>::translation(cubePositions[i]);
+				mat4 model = translation(cubePositions[i]);
 				float angle = 20.0f * i; 
-				Matrix<double> rot = Matrix<double>::rot(degreeToRad(angle), {1.0f, 0.3f, 0.5f});
+				mat4 rot = rotation(radians(angle), {1.0f, 0.3f, 0.5f});
 				model *= rot;
-				shad.setMat("model", model.toGLArray());
+				shad.setMat("model", model.data);
 
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}
