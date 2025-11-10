@@ -1,8 +1,8 @@
-# Install script for directory: /mnt/c/Users/User/Documents/19/Graph_game/Scop42/Includes/glfw-3.4/examples
+# Install script for directory: /home/lvodak/19/graph_game/Scop42/Includes/glfw-3.4/examples
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/xekhtyrl/.local")
+  set(CMAKE_INSTALL_PREFIX "/home/lvodak/.local")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 

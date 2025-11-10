@@ -48,6 +48,9 @@
 		"stdexcept": "cpp",
 		"streambuf": "cpp",
 		"cinttypes": "cpp",
-		"typeinfo": "cpp"
-	}
+		"typeinfo": "cpp",
+		"ranges": "cpp"
+	},
+	"editor.detectIndentation": false,
+	"cmake.ignoreCMakeListsMissing": true
 }

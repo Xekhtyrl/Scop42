@@ -42,19 +42,37 @@ struct Material {
     std::string mapKsPath; // specular texture
     std::string mapBumpPath; // normal/bump map
 
-    GLuint diffuseTex = 0;
-    GLuint specularTex = 0;
-    GLuint normalTex = 0;
+    Texture diffuseTex;
+    Texture specularTex;
+    Texture normalTex;
 };
 
 class Model 
 {
     public:
+		Model() {};
         Model(char *path)
         {
-            loadModel(path);
+			try {
+				loadModel(path);
+			}
+			catch(std::exception &e) {
+				throw;
+			}
         }
-        void Draw(Shader &shader);	
+		Model& operator=(const Model& oth) {
+			if (this != &oth) {
+				meshes = oth.meshes;
+				materials = oth.materials;
+				directory = oth.directory;
+				_name = oth._name;
+			}
+			return *this;
+		}
+        void Draw(Shader &shader) {
+			for (Mesh& x : meshes)
+				x.Draw(shader, materials[x.materialName()]);
+		}	
     private:
         // model data
         std::vector<Mesh> meshes;
@@ -114,7 +132,7 @@ class Model
 						if (vnId > 0)
 							vert.Normal = temp_vn[vnId - 1];
 						currentMesh.vertices().push_back(vert);
-						currentMesh.indices().push_back(currentMesh.indices().size()); // duplicate vertex are not handled
+						currentMesh.indices().push_back(currentMesh.indices().size()); // duplicate vertex are not handled, is it neede to do it?
 					}
 				}
 				else if (tmp.find("g") == 0) {
@@ -133,10 +151,10 @@ class Model
                 else if (type == "usemtl") {
 					std::string matName;
 					ss >> matName;
-					// if (materials.count(matName) == 0){
-					// 	file.close();
-					// 	throw std::runtime_error("Error: Materia not found in .mtl file.");
-					// }
+					if (materials.count(matName) == 0){
+						file.close();
+						throw std::runtime_error("Error: Materia not found in .mtl file.");
+					}
 					currentMesh.materialName(matName);
 				}
                 else if (type == "mtlib") {
@@ -155,7 +173,63 @@ class Model
 				meshes.push_back(currentMesh);
 			}
         }
-        void loadMtl(std::string path) {}
+        void loadMtl(std::string path) {
+			std::ifstream file(directory + path);
+			if (!file.is_open())
+                throw std::runtime_error("Error: Material File could not be opened or does not exist.");
+			std::string line;
+			Material currentMaterial;
+			float x,y,z;
+
+			while (getline(file, line)) {
+				std::stringstream ss(line);
+				std::string type;
+				ss >> type;
+
+				if (type == "newmtl"){
+					if (!currentMaterial.name.empty())
+						materials[currentMaterial.name] = currentMaterial; // store previous
+					currentMaterial = Material(); // reset
+					ss >> currentMaterial.name;
+				}
+				else if (type == "Ka"){
+					ss >> x >> y >> z;
+					currentMaterial.ambient = vec3{x, y, z};
+				}
+				else if (type == "Kd"){
+					ss >> x >> y >> z;
+					currentMaterial.diffuse = vec3{x, y, z};
+				}
+				else if (type == "Ks"){
+					ss >> x >> y >> z;
+					currentMaterial.specular = vec3{x, y, z};
+				}
+				else if (type == "Ns")
+					ss >> currentMaterial.shininess;
+				else if (type == "d" || type == "Tr")
+					ss >> currentMaterial.opacity;
+				else if (type == "mapKd")
+					ss >> currentMaterial.mapKdPath;
+				else if (type == "mapKs")
+					ss >> currentMaterial.mapKsPath;
+				else if (type == "map_Bump" || type == "bump")
+					ss >> currentMaterial.mapBumpPath;
+			}
+			if (!currentMaterial.name.empty())
+				materials[currentMaterial.name] = currentMaterial;
+
+			file.close();
+
+			// Load textures
+			for (auto& [name, mat] : materials) {
+				if (!mat.mapKdPath.empty())
+					mat.diffuseTex = Texture(directory + mat.mapKdPath.c_str());
+				if (!mat.mapKsPath.empty())
+					mat.specularTex = Texture(directory + mat.mapKsPath.c_str());
+				if (!mat.mapBumpPath.empty())
+					mat.normalTex = Texture(directory + mat.mapBumpPath.c_str());
+			}
+		}
         // void processNode(aiNode *node, const aiScene *scene);
         // Mesh processMesh(aiMesh *mesh, const aiScene *scene);
         // std::vector<Textures> loadMaterialTextures(aiMaterial *mat, aiTextureType type, 

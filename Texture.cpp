@@ -1,6 +1,8 @@
 #include "Texture.hpp"
 
 // Default constructor
+Texture::Texture() : _ID(0), _width(0), _height(0), _nrChannels(0) {}
+
 Texture::Texture(std::string filePath, TextureConfig config) {
 	stbi_set_flip_vertically_on_load(config.flipVert);
 	unsigned char *data = stbi_load(filePath.c_str(), &_width, &_height, &_nrChannels, 0);
@@ -33,12 +35,18 @@ Texture::Texture(const Texture &other) {
 
 // Copy assignment overload
 Texture &Texture::operator=(const Texture &rhs) {
-  (void)rhs;
-  return *this;
+	_width = rhs._width;
+	_height = rhs._height;
+	_ID = rhs._ID;
+	_nrChannels = rhs._nrChannels;
+	return *this;
 }
 
 // Default destructor
-Texture::~Texture() { return; }
+Texture::~Texture() {
+	if (_ID)
+		glDeleteTextures(1, &_ID);
+}
 
 // unsigned char* Texture::content() {return _data;}
 int Texture::width() {return _width;}

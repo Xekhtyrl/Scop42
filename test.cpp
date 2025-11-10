@@ -152,7 +152,12 @@ void defineMatrices(Shader shad, Camera& camera) {
 #include "Model.hpp"
 int main(int argc, char **argv)
 {
-	Model obj(argv[argc - 1]);
+	Model obj;
+	try {
+		obj = Model(argv[argc - 1]);
+	} catch (std::exception& e) {
+		std::cerr << e.what() << std::endl;
+	}
 	GLFWwindow* window = initWindow();
 	if (window == NULL)
 	{

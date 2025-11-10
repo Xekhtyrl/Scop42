@@ -22,7 +22,7 @@ class Mesh {
         std::string                 _materialName;
 		unsigned int				VAO;
 
-        Mesh() {}
+        Mesh() {VAO = VBO = EBO = 0;}
         Mesh& operator=(const Mesh& oth) {
             _vertices = oth._vertices;
             _indices = oth._indices;
@@ -35,13 +35,53 @@ class Mesh {
         Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::string textures);
         
 		~Mesh() {
-			glDeleteVertexArrays(1, &VAO);
-    		glDeleteBuffers(1, &VBO);
-    		glDeleteBuffers(1, &EBO);
+			std::cout << VAO << VBO << EBO << std::endl;
+			if (VAO)
+				glDeleteVertexArrays(1, &VAO);
+			if (VBO)
+				glDeleteBuffers(1, &VBO);
+			if (EBO)
+				glDeleteBuffers(1, &EBO);
+			std::cout << "destructor end" << std::endl;
 		}
 		
-		void Draw(Shader &shader) {
+		void Draw(Shader &shader, Material material) {
+			// Bind textures if they exist
+			if (material.diffuseTex.id() != 0) {
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, material.diffuseTex.id());
+				shader.setInt("material.diffuse", 0);
+			}
 
+			if (material.specularTex.id() != 0) {
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, material.specularTex.id());
+				shader.setInt("material.specular", 1);
+			}
+
+			if (material.normalTex.id() != 0) {
+				glActiveTexture(GL_TEXTURE2);
+				glBindTexture(GL_TEXTURE_2D, material.normalTex.id());
+				shader.setInt("material.normalMap", 2);
+			}
+
+			shader.setBool("useDiffuseMap", material.diffuseTex.id() != 0);
+			shader.setBool("useSpecularMap", material.specularTex.id() != 0);
+			shader.setBool("useNormalMap", material.normalTex.id() != 0);
+			// Upload scalar/vec3 uniforms
+			shader.setVec3("material.ambient", material.ambient);
+			shader.setVec3("material.diffuseColor", material.diffuse);
+			shader.setVec3("material.specularColor", material.specular);
+			shader.setFloat("material.shininess", material.shininess);
+			shader.setFloat("material.opacity", material.opacity);
+
+			// Draw the mesh
+			glBindVertexArray(VAO);
+			glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			// Reset active texture (optional)
+			glActiveTexture(GL_TEXTURE0);
 		}
 
 		//getters
@@ -62,6 +102,7 @@ class Mesh {
         unsigned int VBO, EBO;
 
         void setupMesh() {
+			std::cout << "reached setupMesh()" <<std::endl;
 			glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);

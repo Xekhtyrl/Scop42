@@ -40,18 +40,28 @@ $(DIR_OBJ)%.o: %.c
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
+ifeq ($(wildcard Includes/glfw-3.4/build),)
 openGL:
+	$(info Creating build folder)
 	cd $(INC)/glfw-3.4 && \
 	mkdir -p build && \
 	cd build && \
 	cmake .. -DGLFW_BUILD_WAYLAND=OFF -DGLFW_BUILD_X11=ON -DCMAKE_INSTALL_PREFIX=$(HOME)/.local && \
 	make -j && \
 	make install
+else
+openGL:
+	$(info build folder already exists)
+endif
 
 clean:
 	rm -rf $(DIR_OBJ)
 
 fclean: clean
 	rm -f $(NAME)
+
+rebuild:
+	rm -rf $(INC)/glfw-3.4/build
+	make openGL
 
 re: fclean all
