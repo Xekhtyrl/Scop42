@@ -5,7 +5,7 @@ HOME_LIB  = $(HOME)/.local/lib
 HOME_INC  = $(HOME)/.local/include
 DIR_OBJ = Obj/
 
-SRCS = test.cpp CreateShader.cpp utils.cpp Shader.cpp Texture.cpp stb_image.cpp
+SRCS = main.cpp CreateShader.cpp utils.cpp Shader.cpp Texture.cpp stb_image.cpp
 SRCC = glad.c
 
 OBJ = $(addprefix $(DIR_OBJ), $(SRCS:.cpp=.o))

@@ -12,5 +12,5 @@
 #include "../Camera.hpp"
 
 std::string floatToStr(float value);
-void strTrim(std::string& str, std::string arr);
+void strTrim(std::string& str, std::string arr = " \t\r\n");
 std::string fileToStr(std::string filePath);

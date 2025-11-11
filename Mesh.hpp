@@ -3,15 +3,7 @@
 #include <iostream>
 #include "Shader.hpp"
 #include "Includes/vml.hpp"
-
-
-// class Mesh;
-// std::ostream& operator<<(std::ostream& out, const Mesh& obj);
-struct Vertex {
-    vec3 Position;		//v
-    vec3 Normal;		//vn
-    vec2 TexCoords;	//vt
-};
+#include "Includes/struct.hpp"
 
 class Mesh {
     public:
@@ -20,13 +12,14 @@ class Mesh {
         std::vector<Vertex>			_vertices;
         std::vector<unsigned int>	_indices;
         std::string                 _materialName;
-		unsigned int				VAO;
+		// unsigned int				VAO;
 
-        Mesh() {VAO = VBO = EBO = 0;}
+        Mesh() {/* VAO = VBO = EBO = 0; */}
         Mesh& operator=(const Mesh& oth) {
             _vertices = oth._vertices;
             _indices = oth._indices;
             _materialName = oth._materialName;
+			/* VAO = VBO = EBO = 0; */
             // std::cout << oth <<std::endl;
             // std::cout << (this) <<std::endl;
 			setupMesh();
@@ -35,14 +28,12 @@ class Mesh {
         Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::string textures);
         
 		~Mesh() {
-			std::cout << VAO << VBO << EBO << std::endl;
 			if (VAO)
 				glDeleteVertexArrays(1, &VAO);
 			if (VBO)
 				glDeleteBuffers(1, &VBO);
 			if (EBO)
 				glDeleteBuffers(1, &EBO);
-			std::cout << "destructor end" << std::endl;
 		}
 		
 		void Draw(Shader &shader, Material material) {
@@ -99,10 +90,9 @@ class Mesh {
         void name(std::string name) {_name = name;}
     private:
         //  render data
-        unsigned int VBO, EBO;
+        unsigned int VBO, EBO, VAO;
 
         void setupMesh() {
-			std::cout << "reached setupMesh()" <<std::endl;
 			glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);

@@ -1,16 +1,16 @@
 #include "Shader.hpp"
 #include "CreateShader.hpp"
 
-Shader::Shader(const char* vertexCode, const char* fragmentCode)
-{
-	unsigned int vertex, fragment;
+// Shader::Shader(const char* vertexCode, const char* fragmentCode)
+// {
+// 	unsigned int vertex, fragment;
 	
-	CompileShader(vertex, vertexCode, GL_VERTEX_SHADER);
-	CompileShader(fragment, fragmentCode, GL_FRAGMENT_SHADER);
-	CreateShaderProgram(vertex, fragment);
-	glDeleteShader(vertex);
-	glDeleteShader(fragment);
-}
+// 	CompileShader(vertex, vertexCode, GL_VERTEX_SHADER);
+// 	CompileShader(fragment, fragmentCode, GL_FRAGMENT_SHADER);
+// 	CreateShaderProgram(vertex, fragment);
+// 	glDeleteShader(vertex);
+// 	glDeleteShader(fragment);
+// }
 
 Shader::Shader(std::string vertexFilePath, std::string fragmentFilePath) {
 	std::string vShaderCode, fShaderCode;
@@ -44,7 +44,7 @@ void Shader::CompileShader(unsigned int& shader, const char* shaderCode, unsigne
 	glCompileShader(shader);
 	// print compile errors if any
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	std::cerr << shaderCode << std::endl;
+	std::cerr << "code:\n" << shaderCode << std::endl;
 	if(!success)
 	{
 		glGetShaderInfoLog(shader, 512, NULL, infoLog);

@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include "header.h"
 #include "Shader.hpp"
 #include "Mesh.hpp"
 #include "Includes/vml.hpp"
+#include "Includes/struct.hpp"
 #include <unordered_map>
 
 using namespace vml;
@@ -25,35 +27,14 @@ static void parseFaceVertex(const std::string& fLine, unsigned int& vId, unsigne
 	}
 }
 
-// struct Textures;
-struct Vertex;
-
-// ─────────────────────────────────────────────
-// Represents one material definition (.mtl)
-struct Material {
-    std::string name;
-    vec3 ambient{1.0f};
-    vec3 diffuse{1.0f};
-    vec3 specular{1.0f};
-    float shininess = 32.0f;
-    float opacity = 1.0f;
-
-    std::string mapKdPath; // diffuse texture file path
-    std::string mapKsPath; // specular texture
-    std::string mapBumpPath; // normal/bump map
-
-    Texture diffuseTex;
-    Texture specularTex;
-    Texture normalTex;
-};
-
 class Model 
 {
     public:
-		Model() {};
+		Model() {totalMesh = 0;};
         Model(char *path)
         {
 			try {
+				totalMesh = 0;
 				loadModel(path);
 			}
 			catch(std::exception &e) {
@@ -66,13 +47,21 @@ class Model
 				materials = oth.materials;
 				directory = oth.directory;
 				_name = oth._name;
+				totalMesh = oth.totalMesh;
 			}
 			return *this;
 		}
         void Draw(Shader &shader) {
 			for (Mesh& x : meshes)
 				x.Draw(shader, materials[x.materialName()]);
-		}	
+		}
+
+		void printMeshNames() {
+			for (auto& x : meshes)
+				std::cout << x.materialName() <<std::endl;
+		}
+		int totalMesh;
+		size_t ms() {return meshes.size();}
     private:
         // model data
         std::vector<Mesh> meshes;
@@ -139,6 +128,7 @@ class Model
 					if (!currentMesh.vertices().empty()) {
 						// std::cout << currentMesh <<std::endl;
 						meshes.push_back(currentMesh);
+						totalMesh += 1;
 						currentMesh = Mesh();
 					}
 					std::string name;
@@ -149,17 +139,32 @@ class Model
                 else if (type == "o")
 					ss >> _name;
                 else if (type == "usemtl") {
+					if (!currentMesh.vertices().empty()) {
+						// std::cout << currentMesh <<std::endl;
+						meshes.push_back(currentMesh);
+						std::string name = currentMesh.name();
+						currentMesh = Mesh();
+						currentMesh.name(name);
+						totalMesh +=1;
+					}
 					std::string matName;
 					ss >> matName;
+					std::cout << matName <<std::endl;
+					if (matName.find_last_of(":") < matName.size())
+						matName = matName.substr(matName.find_last_of(":") + 1);
+					std::cout << matName <<std::endl;
 					if (materials.count(matName) == 0){
 						file.close();
-						throw std::runtime_error("Error: Materia not found in .mtl file.");
+						for (auto& [key, val]: materials)
+							std::cout << key << val.name <<std::endl;
+						throw std::runtime_error("Error: Materia not found in .mtl file: " + matName);
 					}
 					currentMesh.materialName(matName);
 				}
-                else if (type == "mtlib") {
+                else if (type == "mtllib") {
 					std::string mtlpath;
 					ss >> mtlpath;
+					convertMtlPath(mtlpath);
 					try {
 						loadMtl(mtlpath);
 					}
@@ -171,10 +176,12 @@ class Model
 			if (!currentMesh.vertices().empty()){
 				// std::cout << currentMesh <<std::endl;
 				meshes.push_back(currentMesh);
+				totalMesh += 1;
 			}
         }
         void loadMtl(std::string path) {
 			std::ifstream file(directory + path);
+			std::cout << directory + path << std::endl;
 			if (!file.is_open())
                 throw std::runtime_error("Error: Material File could not be opened or does not exist.");
 			std::string line;
@@ -191,6 +198,7 @@ class Model
 						materials[currentMaterial.name] = currentMaterial; // store previous
 					currentMaterial = Material(); // reset
 					ss >> currentMaterial.name;
+					std::cout << "Material name: " + currentMaterial.name <<std::endl;
 				}
 				else if (type == "Ka"){
 					ss >> x >> y >> z;
@@ -243,5 +251,10 @@ class Model
 			}
             return true;
         }
-
+		void convertMtlPath(std::string& mtlpath) {
+			if (mtlpath[0] == '.')
+				strTrim(mtlpath, ".");
+			if (mtlpath[0] != '/')
+				mtlpath.insert(mtlpath.begin(), '/');
+		}
 };

@@ -7,7 +7,9 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-  
+#include "vml.hpp"
+
+using namespace vml;
 
 class Shader
 {
@@ -19,7 +21,7 @@ public:
 		void CreateShaderProgram(unsigned int, unsigned int);
 	public:
 		// constructor reads and builds the shader
-		Shader(const char* vertexCode, const char* fragmentCode);
+		// Shader(const char* vertexCode, const char* fragmentCode);
 		Shader(std::string vertexFilePath, std::string fragmentFilePath);
 		// use/activate the shader
 		void use();
