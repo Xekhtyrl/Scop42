@@ -127,6 +127,7 @@ class Model
 				else if (tmp.find("g") == 0) {
 					if (!currentMesh.vertices().empty()) {
 						// std::cout << currentMesh <<std::endl;
+						currentMesh.setupMesh();
 						meshes.push_back(currentMesh);
 						totalMesh += 1;
 						currentMesh = Mesh();
@@ -142,6 +143,7 @@ class Model
 					if (!currentMesh.vertices().empty()) {
 						// std::cout << currentMesh <<std::endl;
 						meshes.push_back(currentMesh);
+						currentMesh.setupMesh();
 						std::string name = currentMesh.name();
 						currentMesh = Mesh();
 						currentMesh.name(name);
@@ -149,14 +151,9 @@ class Model
 					}
 					std::string matName;
 					ss >> matName;
-					std::cout << matName <<std::endl;
 					if (matName.find_last_of(":") < matName.size())
 						matName = matName.substr(matName.find_last_of(":") + 1);
-					std::cout << matName <<std::endl;
 					if (materials.count(matName) == 0){
-						file.close();
-						for (auto& [key, val]: materials)
-							std::cout << key << val.name <<std::endl;
 						throw std::runtime_error("Error: Materia not found in .mtl file: " + matName);
 					}
 					currentMesh.materialName(matName);
@@ -175,6 +172,7 @@ class Model
             }
 			if (!currentMesh.vertices().empty()){
 				// std::cout << currentMesh <<std::endl;
+				currentMesh.setupMesh();
 				meshes.push_back(currentMesh);
 				totalMesh += 1;
 			}

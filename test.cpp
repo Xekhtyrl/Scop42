@@ -217,7 +217,7 @@ int main(int argc, char **argv)
 			lastFrame = currentFrame; 
 			processInput(window, camera);
 			// Set the clear color (RGBA)
-			glClearColor(0, 0, 0, 1.0f);
+			glClearColor(0, 0, 0.9, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 			glActiveTexture(GL_TEXTURE0);

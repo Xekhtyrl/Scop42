@@ -14,46 +14,47 @@ class Mesh {
         std::string                 _materialName;
 		// unsigned int				VAO;
 
-        Mesh() {/* VAO = VBO = EBO = 0; */}
+        Mesh() {VAO = VBO = EBO = 0;}
         Mesh& operator=(const Mesh& oth) {
             _vertices = oth._vertices;
             _indices = oth._indices;
             _materialName = oth._materialName;
-			/* VAO = VBO = EBO = 0; */
-            // std::cout << oth <<std::endl;
-            // std::cout << (this) <<std::endl;
-			setupMesh();
             return *this;
         }
         Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::string textures);
         
-		~Mesh() {
-			if (VAO)
-				glDeleteVertexArrays(1, &VAO);
-			if (VBO)
-				glDeleteBuffers(1, &VBO);
-			if (EBO)
-				glDeleteBuffers(1, &EBO);
-		}
+		// ~Mesh() {
+		// 	if (VAO)
+		// 		glDeleteVertexArrays(1, &VAO);
+		// 	if (VBO)
+		// 		glDeleteBuffers(1, &VBO);
+		// 	if (EBO)
+		// 		glDeleteBuffers(1, &EBO);
+		// }
 		
 		void Draw(Shader &shader, Material material) {
+			// std::cout << "mesh drawn" << std::endl;
 			// Bind textures if they exist
+			glBindVertexArray(VAO);
 			if (material.diffuseTex.id() != 0) {
+				std::cout << "diffuse tex" << std::endl;
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, material.diffuseTex.id());
 				shader.setInt("material.diffuse", 0);
 			}
-
-			if (material.specularTex.id() != 0) {
-				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, material.specularTex.id());
-				shader.setInt("material.specular", 1);
-			}
-
+			
 			if (material.normalTex.id() != 0) {
+				std::cout << "normal" << std::endl;
 				glActiveTexture(GL_TEXTURE2);
 				glBindTexture(GL_TEXTURE_2D, material.normalTex.id());
-				shader.setInt("material.normalMap", 2);
+				shader.setInt("material.normalMap", 1);
+			}
+
+			if (material.specularTex.id() != 0) {
+				std::cout << "specular" << std::endl;
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, material.specularTex.id());
+				shader.setInt("material.specular", 2);
 			}
 
 			shader.setBool("useDiffuseMap", material.diffuseTex.id() != 0);
@@ -66,40 +67,43 @@ class Mesh {
 			shader.setFloat("material.shininess", material.shininess);
 			shader.setFloat("material.opacity", material.opacity);
 
+			//set light
+			shader.setVec3("lightPos", vec3{0.,1.,0.});
+			shader.setVec3("lightColor", vec3{1,1,1});
+			shader.setVec3("viewPos", vec3{1,0,0});
+
 			// Draw the mesh
-			glBindVertexArray(VAO);
+			// glBindVertexArray(VAO);
+
+
 			glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
+			// GLenum err;
+			// while ((err = glGetError()) != GL_NO_ERROR)
+			// 	std::cerr << "GL error: " << err << std::endl;
+			// std::cerr << "VAO=" << VAO 
+			// 	<< " VBO=" << VBO 
+			// 	<< " EBO=" << EBO 
+			// 	<< " vertices=" << _vertices.size() 
+			// 	<< " indices=" << _indices.size() << std::endl;
 			glBindVertexArray(0);
 
 			// Reset active texture (optional)
 			glActiveTexture(GL_TEXTURE0);
 		}
 
-		//getters
-        std::vector<Vertex> vertices() const {return _vertices;}
-        std::vector<Vertex>& vertices() {return _vertices;}
-        std::vector<unsigned int> indices() const {return _indices;}
-        std::vector<unsigned int>& indices() {return _indices;}
-        std::string materialName() const {return _materialName;}
-        std::string name() const {return _name;}
-
-		//setters
-        void vertices(std::vector<Vertex> vertices) {_vertices = vertices;}
-        void indices(std::vector<unsigned int> idxs) {_indices = idxs;}
-        void materialName(std::string matName) {_materialName = matName;}
-        void name(std::string name) {_name = name;}
-    private:
-        //  render data
-        unsigned int VBO, EBO, VAO;
-
-        void setupMesh() {
+		void setupMesh() {
+			std::cout << "Setup Mesh"<< std::endl;
 			glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);
+
+			    std::cout << "After glGen: VAO=" << VAO 
+              << " VBO=" << VBO 
+              << " EBO=" << EBO << std::endl;
 		
 			glBindVertexArray(VAO);
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
+			// changed &_vertices[0] to _vertices.data(), same for _indices, just in case. Might change it back
 			glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(Vertex), &_vertices[0], GL_STATIC_DRAW);  
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -118,64 +122,23 @@ class Mesh {
 
 			glBindVertexArray(0);
 		}
+
+		//getters
+        std::vector<Vertex>& vertices() {return _vertices;}
+        std::vector<Vertex> vertices() const {return _vertices;}
+        std::vector<unsigned int>& indices() {return _indices;}
+        std::vector<unsigned int> indices() const {return _indices;}
+        std::string materialName() const {return _materialName;}
+        std::string name() const {return _name;}
+
+		//setters
+        void vertices(std::vector<Vertex>& vertices) {_vertices = vertices;}
+        void indices(std::vector<unsigned int>& idxs) {_indices = idxs;}
+        void materialName(std::string matName) {_materialName = matName;}
+        void name(std::string name) {_name = name;}
+		GLuint VAO;
+		GLuint VBO;
+		GLuint EBO;
+    private:
+        //  render data
 };
-
-// std::ostream& operator<<(std::ostream& out, const Mesh& obj) {
-//     out << "Mesh: " << obj.name() << std::endl;
-//     out << "\tvertices: (" << obj.vertices().size() << ")\n";
-//     for (std::vector<Vertex>::iterator it = obj.vertices().begin(); it != obj.vertices().end(); it++)
-//         out << "\t\t" <<(*it).Position << " " << (*it).TexCoords << " " << (*it).Normal << std::endl;
-//     out << "\tindices: (" << obj.indices().size() << ")\n";
-//     for (std::vector<unsigned int>::iterator it = obj.indices().begin(); it != obj.indices().end(); it++)
-//         out << (*it) << " ";
-//     out << std::endl;
-//     out << "Material name: " << obj.materialName() << std::endl;
-//     return out;
-// }
-
-// void printv3(std::ostream& out =std::cout, vec3 vec = {}) {
-//     out << vec[0] << " " << vec[1] << " " << vec[2] << std::endl;
-// }
-// void printv2(std::ostream& out =std::cout, vec2 vec = {}) {
-//     out << vec[0] << " " << vec[1] << std::endl;
-// }
-
-// std::ostream& operator<<(std::ostream& out, const Mesh& obj) {
-//     out << "Mesh: " << obj.name() << "\n";
-
-//     const auto& verts = obj.vertices();   // must be const accessor returning vector<Vertex>
-//     out << "\tvertices: (" << verts.size() << ")\n";
-
-//     for (size_t i = 0; i < verts.size(); ++i) {
-//         const auto &v = verts[i];
-//         out << "[" << i << "] ";
-
-//         // print position if present (expecting Vector<float> of size 3)
-//         out << "pos=";
-//         /* if (v.Position.size() > 0) */ printv3(out, v.Position);
-//         /* else out << "(empty)"; */
-
-//         // print texcoords if present (size > 0)
-//         out << " tex=";
-//         /* if (v.TexCoords.size() > 0) */ printv2(out, v.TexCoords);
-//        /*  else out << "(none)"; */
-
-//         // print normal if present
-//         out << " norm=";
-//         /* if (v.Normal.size() > 0) */ printv3(out, v.Normal);
-//         /* else out << "(none)"; */
-
-//         out << "\n";
-//     }
-
-//     const auto& idx = obj.indices();
-//     out << "\tindices: (" << idx.size() << ")\n\t\t";
-//     for (size_t i = 0; i < idx.size(); ++i) {
-//         out << idx[i];
-//         if (i + 1 < idx.size()) out << " ";
-//     }
-//     out << "\n";
-
-//     out << "Material: " << obj.materialName() << "\n";
-//     return out;
-// }

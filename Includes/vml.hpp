@@ -111,7 +111,7 @@ namespace vml {
 		// getter
 		constexpr const size_t size() const {return N;}
 
-		void print() {
+		void print() const {
 			std::cout << "[";
 			for (size_t i = 0; i < N; i++){
 				std::cout << data[i];
@@ -221,8 +221,14 @@ namespace vml {
 					res[r] += vec[c] * (*this)[r][c];
 			return res;
 		}
+		template<size_t C2>
+		Matrix<T, R, R>& scale(Vector<T, C2> v) {
+			for (size_t i = 0; i < R && i < C2; i++)
+				(*this)[i][i] *= v[i];
+			return *this;
+		}
 		//getter
-		void print() {
+		void print() const {
 			std::cout << "[";
 			for (size_t i = 0; i < R; i++) {
 				std::cout << "[";

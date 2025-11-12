@@ -5,6 +5,12 @@
 
 using namespace vml;
 
+struct Coordinate {
+	float x = 0;
+	float y = 0;
+	float z = 0;
+};
+
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 float deltaTime = 0.0f;	// Time between current frame and last frame
@@ -75,13 +81,22 @@ GLFWwindow* initWindow() {
 }
 
 void defineMatrices(Shader shad, Camera& camera) {
-	mat4 view = identity<float,4>(); //camera.GetViewMatrix();
-	mat4 projection = identity<float,4>(); //perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1, 100.);
+	mat4 view = camera.GetViewMatrix(); //identity<float,4>(); //
+	mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1, 100.); //identity<float,4>(); //
+	mat4 model = translation(vec3{0, -25, -50});   // move object
+	model.print();
+	model *= rotation(radians(90), vec3{0,1,0}); // rotate around y-axis
+	model.print();
+	model = model.scale(vec3{0.1, 0.1, 0.1});    // scale object
+	model.print();
+
 
 	int viewLoc = glGetUniformLocation(shad.getID(), "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_TRUE, view.data);
 	int projectionLoc = glGetUniformLocation(shad.getID(), "projection");
 	glUniformMatrix4fv(projectionLoc, 1, GL_TRUE, projection.data);
+	int modelLoc = glGetUniformLocation(shad.getID(), "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_TRUE, model.data);
 }
 
 int main(int argc, char **argv)
@@ -122,6 +137,7 @@ int main(int argc, char **argv)
 	// Center cursor after window is visible
 	glfwSetCursorPos(window, SCR_WIDTH / 2.0, SCR_HEIGHT / 2.0);
 	glEnable(GL_DEPTH_TEST);
+	GLenum err;
 	try {
 		Shader shad("ShadersFiles/FinalVertexTexShad.glsl", "ShadersFiles/FinalFragTexShad.glsl");
 		Model obj = Model(argv[argc - 1]);
@@ -134,15 +150,19 @@ int main(int argc, char **argv)
 			lastFrame = currentFrame; 
 			processInput(window, camera);
 			// Set the clear color (RGBA)
-			glClearColor(0, 0, 0, 1.0f);
+        	glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 			// glActiveTexture(GL_TEXTURE1);
 			// glBindTexture(GL_TEXTURE_2D, tex2.id());
-			
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			shad.use();
 			defineMatrices(shad, camera);
+
 			obj.Draw(shad);
+			// shad.use();
+			// defineMatrices(shad, camera);
+			// obj.Draw(shad);
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 			

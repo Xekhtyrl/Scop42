@@ -2,7 +2,7 @@
 in vec2 TexCoords;
 in vec3 Normal;
 in vec3 FragPos;
-in mat3 TBN; // Tangent-Bitangent-Normal matrix for normal mapping
+//in mat3 TBN; // Tangent-Bitangent-Normal matrix for normal mapping
 
 uniform vec3 lightPos;
 uniform vec3 lightColor;
@@ -44,7 +44,7 @@ void main()
     vec3 normal = normalize(Normal);
     if (useNormalMap) {
         vec3 tangentNormal = texture(material.normalMap, TexCoords).rgb * 2.0 - 1.0;
-        normal = normalize(TBN * tangentNormal);
+        normal = normalize(tangentNormal);
     }
 
     // Lighting vectors
