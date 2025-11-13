@@ -33,6 +33,7 @@ class Mesh {
 		// }
 		
 		void Draw(Shader &shader, Material material) {
+			unsigned int maxIndex = *std::max_element(_indices.begin(), _indices.end());
 			// std::cout << "mesh drawn" << std::endl;
 			// Bind textures if they exist
 			glBindVertexArray(VAO);
@@ -68,9 +69,9 @@ class Mesh {
 			shader.setFloat("material.opacity", material.opacity);
 
 			//set light
-			shader.setVec3("lightPos", vec3{0.,1.,0.});
+			shader.setVec3("lightPos", vec3{1.,1.,1.});
 			shader.setVec3("lightColor", vec3{1,1,1});
-			shader.setVec3("viewPos", vec3{1,0,0});
+			shader.setVec3("viewPos", vec3{1,1,1});
 
 			// Draw the mesh
 			// glBindVertexArray(VAO);

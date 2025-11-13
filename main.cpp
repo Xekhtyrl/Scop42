@@ -5,12 +5,6 @@
 
 using namespace vml;
 
-struct Coordinate {
-	float x = 0;
-	float y = 0;
-	float z = 0;
-};
-
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 float deltaTime = 0.0f;	// Time between current frame and last frame
@@ -19,6 +13,7 @@ bool firstMouse = true;
 float lastX =  SCR_WIDTH / 2.0;
 float lastY =  SCR_HEIGHT / 2.0;
 Camera camera(vec3({0.,0.,3.}));
+mat4 model = identity<float, 4>();
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -38,6 +33,24 @@ void processInput(GLFWwindow *window, Camera& camera)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
+		std::cout << "rotate left" <<std::endl;
+		model *= rotation(radians(5), vec3{0,1,0});
+	}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
+		std::cout << "rotate right" <<std::endl;
+		model *= rotation(radians(-5), vec3{0,1,0});
+	}
+	if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS){
+		std::cout << "scale down" <<std::endl;
+		model.print();
+		model *= scale(vec3{0.9,0.9,0.9});
+		model.print();
+	}
+	if (glfwGetKey(window, GLFW_KEY_KP_ADD) == GLFW_PRESS){
+		std::cout << "scale up" <<std::endl;
+		model *= scale(vec3{1.1,1.1,1.1});
+	}
 }
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
@@ -80,15 +93,23 @@ GLFWwindow* initWindow() {
 	return glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
 }
 
+void setBaseModelMatrix(Model obj){
+	vec3 center = (obj.min() + obj.max()) * 0.5;
+	vec3 size = obj.max() - obj.min();
+	float maxExtent = std::max(size[0], std::max(size[1], size[2]));
+	mat4 normalization = identity<float, 4>();
+	normalization *= translation(center * -1);                // move to origin
+	normalization *= scale(vec3{1.0f / maxExtent});     	// uniform scale
+	model = normalization;
+}
+
 void defineMatrices(Shader shad, Camera& camera) {
 	mat4 view = camera.GetViewMatrix(); //identity<float,4>(); //
 	mat4 projection = perspective(radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1, 100.); //identity<float,4>(); //
-	mat4 model = translation(vec3{0, -25, -50});   // move object
-	model.print();
-	model *= rotation(radians(90), vec3{0,1,0}); // rotate around y-axis
-	model.print();
-	model = model.scale(vec3{0.1, 0.1, 0.1});    // scale object
-	model.print();
+	// model.print();
+	// model.print();
+	  // scale object
+	// model.print();
 
 
 	int viewLoc = glGetUniformLocation(shad.getID(), "view");
@@ -137,10 +158,24 @@ int main(int argc, char **argv)
 	// Center cursor after window is visible
 	glfwSetCursorPos(window, SCR_WIDTH / 2.0, SCR_HEIGHT / 2.0);
 	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 	GLenum err;
 	try {
 		Shader shad("ShadersFiles/FinalVertexTexShad.glsl", "ShadersFiles/FinalFragTexShad.glsl");
 		Model obj = Model(argv[argc - 1]);
+		setBaseModelMatrix(obj);
+		// std::cout << "print Vertices MEshes" << std::endl;
+		// for (auto& x : obj.getMeshes()){
+		// 	for (auto& y: x.vertices()){
+		// 		y.Normal.print();
+		// 		y.Position.print();
+		// 		y.TexCoords.print();
+		// 	}
+		// 	for (auto& y : x.indices()){
+		// 		std::cout << y << " ";
+		// 	}
+		// 	std::cout << "\n";
+		// }
 
 		while(!glfwWindowShouldClose(window))
 		{
@@ -150,19 +185,13 @@ int main(int argc, char **argv)
 			lastFrame = currentFrame; 
 			processInput(window, camera);
 			// Set the clear color (RGBA)
-        	glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+        	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
-			// glActiveTexture(GL_TEXTURE1);
-			// glBindTexture(GL_TEXTURE_2D, tex2.id());
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			shad.use();
 			defineMatrices(shad, camera);
 
 			obj.Draw(shad);
-			// shad.use();
-			// defineMatrices(shad, camera);
-			// obj.Draw(shad);
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 			

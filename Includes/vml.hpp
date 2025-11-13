@@ -99,6 +99,14 @@ namespace vml {
 				x *= val;
 			return *this;
 		}
+		bool operator==(const Vector<T, N> vec) const {
+			for (size_t i = 0; i < N; i++){
+				// std::cout << data[i] << " " << vec[i] <<std::endl;
+				if (data[i] != vec[i])
+					return false;
+			}
+			return true;
+		}
 				// Cross product (only for 3D)
 		Vector<T, 3> operator*(const Vector<T, 3>& v) const requires (N == 3) {
 			return {
@@ -344,5 +352,14 @@ namespace vml {
 			0,						0,					-2 / (far - near),	-(far + near) / (far - near)	,
 			0,						0,					0,					1							
 			});
+	}
+
+	inline mat4 scale(vec3 vec) {
+		return mat4({
+			vec[0],	0,		0,		0,
+			0,		vec[1],	0,		0,
+			0,		0,		vec[2],	0,
+			0,		0,		0,		1
+		});
 	}
 }
