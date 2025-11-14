@@ -6,11 +6,13 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include "../CreateShader.hpp"
-#include "../Shader.hpp"
-#include "../Texture.hpp"
-#include "../Camera.hpp"
+#include <vml.hpp>
+#include "utils.h"
 
-std::string floatToStr(float value);
-void strTrim(std::string& str, std::string arr = " \t\r\n");
-std::string fileToStr(std::string filePath);
+
+#include <globals.hpp>
+#include "../Model.hpp"
+#include "../Texture.hpp"
+#include "../Shader.hpp"
+#include "../Mesh.hpp"
+#include "../Camera.hpp"

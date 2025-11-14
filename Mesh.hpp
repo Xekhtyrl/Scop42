@@ -93,14 +93,9 @@ class Mesh {
 		}
 
 		void setupMesh() {
-			std::cout << "Setup Mesh"<< std::endl;
 			glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);
-
-			    std::cout << "After glGen: VAO=" << VAO 
-              << " VBO=" << VBO 
-              << " EBO=" << EBO << std::endl;
 		
 			glBindVertexArray(VAO);
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);

@@ -37,7 +37,7 @@ namespace std {
 }
 
 
-void parseFaceVertex(const std::string& token, unsigned int& vId, unsigned int& vtId, unsigned int& vnId)
+static void parseFaceVertex(const std::string& token, unsigned int& vId, unsigned int& vtId, unsigned int& vnId)
 {
 	vId = vtId = vnId = 0;
 	std::string tok = token;
@@ -89,6 +89,8 @@ class Model
 				directory = oth.directory;
 				_name = oth._name;
 				totalMesh = oth.totalMesh;
+				_min = oth._min;
+				_max = oth._max;
 			}
 			return *this;
 		}

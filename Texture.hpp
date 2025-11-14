@@ -2,8 +2,10 @@
 #define TEXTURE_HPP_
 
 #include <iostream>
+#include <glad/glad.h> 
+#include <GLFW/glfw3.h>
+#include <GL/glext.h>
 #include "Includes/stb_image.h"
-#include "Includes/header.h"
 #include <array>
 
 // Class declaration
