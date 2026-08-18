@@ -49,8 +49,16 @@ void Mesh::Draw(Shader &shader, Material material) {
 		glActiveTexture(GL_TEXTURE0);
 		shader.setInt("customTex", 0);
 		glBindTexture(GL_TEXTURE_2D,setup.custom.id());
+		shader.setFloat("textureGradient", _textureScale);	
 	}
-	else if (material.diffuseTex.id() != 0) {
+	else if (!setup.applyCustomTexture && _textureScale > 0.0f && setup.custom.id()) {
+
+			glActiveTexture(GL_TEXTURE0);
+			shader.setInt("customTex", 0);
+			glBindTexture(GL_TEXTURE_2D,setup.custom.id());
+			shader.setFloat("textureGradient", _textureScale); 
+	}
+	if (material.diffuseTex.id() != 0) {
 		glActiveTexture(GL_TEXTURE1);
 		shader.setInt("material.diffuse", 1);
 		glBindTexture(GL_TEXTURE_2D, material.diffuseTex.id());
@@ -70,10 +78,11 @@ void Mesh::Draw(Shader &shader, Material material) {
 		glBindTexture(GL_TEXTURE_2D, material.normalTex.id());
 	}
 
+	bool useCustomTex = (setup.applyCustomTexture || _textureScale > 0.0f) && setup.custom.id() != 0;
 	// booleans
 	shader.setBool("showFaces", setup.showFaces);
 	shader.setBool("changeColor", setup.showColors);
-	shader.setBool("useCustomTex", setup.applyCustomTexture && setup.custom.id() != 0);
+	shader.setBool("useCustomTex", useCustomTex);
 	shader.setBool("useDiffuseMap",  material.diffuseTex.id()  != 0);
 	shader.setBool("useSpecularMap", material.specularTex.id() != 0);
 	shader.setBool("useNormalMap",   material.normalTex.id()   != 0);
@@ -246,4 +255,23 @@ void Mesh::generateDefaultVN(vec3 min, vec3 size) {
 	// Normalize final normals
 	for (auto &v : _vertices)
 		v.Normal = normalize(v.Normal);
+}
+
+void Mesh::applyCustomTextureBuffering(float deltaTime) {
+	if (setup.applyCustomTexture && setup.custom.id()){
+		if (_textureScale < 1.0f) {
+			_textureScale += _textureScaleIncrement * _textureScaleTime * deltaTime;
+		}
+		else {
+			_textureScale = 1.0f;
+		}
+	}
+	else if (!setup.applyCustomTexture && _textureScale > 0.1f && setup.custom.id()) {
+		if (_textureScale > _textureScaleIncrement * _textureScaleTime * deltaTime) {
+			_textureScale += (-1 * _textureScaleIncrement) * _textureScaleTime * deltaTime;
+		}
+		else {
+			_textureScale = 0.0f;
+		}
+	}
 }

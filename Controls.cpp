@@ -1,6 +1,8 @@
 #include "Includes/header.h"
 #include "Includes/vml.hpp"
-
+#include "Includes/imgui/imgui.h"
+#include "Includes/imgui/imgui_impl_glfw.h"
+#include "Includes/imgui/imgui_impl_opengl3.h"
 
 /**
  * @brief main function that regroup and process all inputs (functions)
@@ -33,24 +35,35 @@ void processInput(GLFWwindow *window, Model& object)
  */
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
-	float xpos = static_cast<float>(xposIn);
-	float ypos = static_cast<float>(yposIn);
-	
-	if (camera.firstMouse)
-	{
-		glfwSetCursorPos(window, SCR_WIDTH / 2.0, SCR_HEIGHT / 2.0);
-		lastX = xpos;
-		lastY = ypos;
-		camera.firstMouse = false;
-	}
+	ImGui_ImplGlfw_CursorPosCallback(window, xposIn, yposIn);
+	if (ImGui::GetIO().WantCaptureMouse)
+        return;
 
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos;
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
 
-	lastX = xpos;
-	lastY = ypos;
+    if (camera.firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        camera.firstMouse = false;
+    }
 
-	camera.ProcessMouseMovement(xoffset, yoffset);
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+
+    lastX = xpos;
+    lastY = ypos;
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        camera.ProcessMouseMovement(xoffset, yoffset);
+    }
+    else
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
 }
 
 /**

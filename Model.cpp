@@ -174,3 +174,9 @@ void Model::convertMtlPath(std::string& mtlpath) {
 	if (mtlpath[0] != '/')
 		mtlpath.insert(mtlpath.begin(), '/');
 }
+
+void Model::applyCustomTextureBuffering(float deltaTime) {
+	for (auto& mesh : meshes) {
+		mesh.applyCustomTextureBuffering(deltaTime);
+	}
+}

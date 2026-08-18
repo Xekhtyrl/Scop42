@@ -37,6 +37,7 @@ class Mesh {
         void name(std::string name);
 		void vnPresent(bool present);
 		void vtPresent(bool present);
+		void applyCustomTextureBuffering(float deltaTime);
 
     private:
 		        // mesh data
@@ -49,6 +50,9 @@ class Mesh {
 		GLuint 						_VAO;
 		GLuint 						_VBO;
 		GLuint 						_EBO;
+		float						_textureScale = 0.0f;
+		float						_textureScaleIncrement = 0.01f;
+		float						_textureScaleTime = 100.f;
 
 		vec2 generateCubicUV(const vec3& p, const vec3& n, 
                      const vec3& min, const vec3& size);

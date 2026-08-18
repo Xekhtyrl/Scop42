@@ -17,6 +17,8 @@ uniform bool useCustomTex;
 uniform bool showFaces;
 uniform bool changeColor;
 
+uniform float textureGradient;
+
 uniform sampler2D customTex;
 
 struct Material {
@@ -38,7 +40,7 @@ vec3 randomColor(int id) {
     return fract(vec3(
         sin(id * 12.9898) * 43758.5453,
         0,
-        0
+		0
     ));
 }
 
@@ -54,8 +56,13 @@ void main()
 	}
     // Base color (diffuse)
 	vec3 albedo;
-	if (useCustomTex)
-		albedo = texture(customTex, TexCoords).rgb;
+	if (useCustomTex) {
+		if (useDiffuseMap){
+			albedo = mix(texture(material.diffuse, TexCoords).rgb, texture(customTex, TexCoords).rgb, textureGradient);
+		}else{
+			albedo = mix(material.diffuseColor, texture(customTex, TexCoords).rgb, textureGradient);
+}
+	}
 	else if (useDiffuseMap)
 		albedo = texture(material.diffuse, TexCoords).rgb;
 	else

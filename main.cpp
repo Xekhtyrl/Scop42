@@ -72,6 +72,7 @@ void renderLoop(GLFWwindow *window, Shader& shader, Model& object) {
 		shader.use();
 		defineMatrices(shader);
 		
+		object.applyCustomTextureBuffering(deltaTime);
 		object.Draw(shader);
 		
 		createUIImgui();

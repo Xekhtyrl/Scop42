@@ -47,6 +47,8 @@ class Model
 		std::vector<Mesh> getMeshes();
 		vec3 min();
 		vec3 max();
+		void applyCustomTextureBuffering(float deltaTime);
+
 	private:
 		// model data
 		std::vector<Mesh> meshes;
