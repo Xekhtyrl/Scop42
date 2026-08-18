@@ -9,6 +9,7 @@
 #include <iostream>
 #include <exception>
 #include "vml.hpp"
+#include "header.h"
 
 using namespace vml;
 

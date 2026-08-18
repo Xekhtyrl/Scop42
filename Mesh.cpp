@@ -266,7 +266,7 @@ void Mesh::applyCustomTextureBuffering(float deltaTime) {
 			_textureScale = 1.0f;
 		}
 	}
-	else if (!setup.applyCustomTexture && _textureScale > 0.1f && setup.custom.id()) {
+	else if (!setup.applyCustomTexture && _textureScale > 0.0f && setup.custom.id()) {
 		if (_textureScale > _textureScaleIncrement * _textureScaleTime * deltaTime) {
 			_textureScale += (-1 * _textureScaleIncrement) * _textureScaleTime * deltaTime;
 		}

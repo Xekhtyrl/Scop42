@@ -17,9 +17,11 @@ std::string fileToStr(const std::string& filePath);
 #include "struct.hpp"
 #include "../Shader.hpp"
 
+class Shader;
+
 extern Setup setup;
-extern unsigned int SCR_WIDTH;
-extern unsigned int SCR_HEIGHT;
+extern const unsigned int SCR_WIDTH;
+extern const unsigned int SCR_HEIGHT;
 extern float lastX;
 extern float lastY;
 extern float deltaTime;
@@ -36,8 +38,6 @@ extern vml::vec3 center;
 
 // #include <globals.hpp>
 
-
-#include "../Shader.hpp"
 #include "../Camera.hpp"
 //modelMatrices.cpp
 void setBaseModelMatrix(GLFWwindow *window, Model& object);
